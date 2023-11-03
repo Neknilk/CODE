@@ -9,7 +9,7 @@ dataframe = {}
 
 unique_flights = []
 
-for i in range(1, 26):
+for i in range(1, 2):
     filename = f'File_{i}.csv'
     full_path = file_directory + filename  
     df = pd.read_csv(full_path, dtype={'timestamp': str}, low_memory=False)
@@ -24,3 +24,4 @@ for i in range(1, 26):
 
 
 print("Number of unique flights:", len(unique_flights))
+print(df)
