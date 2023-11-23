@@ -9,20 +9,18 @@ dataframe = {}
 
 unique_flights = []
 
-for i in range(1, 26):
+for i in range(21, 22):
     filename = f'File_{i}.csv'
     full_path = file_directory + filename  
     df = pd.read_csv(full_path, dtype={'timestamp': str}, low_memory=False)
     
     grouped = df.groupby(['icao24', 'day'])
 
-    for (icao24, date), group_data in grouped:
+    for (icao24, day), group_data in grouped:
         # Check if this flight combination is already in the list
-        flight_key = (icao24, date)
+        flight_key = (icao24, day)
         if flight_key not in unique_flights:
             unique_flights.append(flight_key)
 
 
 print("Number of unique flights:", len(unique_flights))
-
-

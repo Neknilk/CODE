@@ -1,0 +1,21 @@
+import pandas as pd
+import os
+
+# Set your file directory
+file_directory = r'C:\Users\jayva\OneDrive\alles\Bureaublad\DATA\\'
+
+unique_flights = set()
+
+for i in range(21, 22):
+    filename = f'File_{i}.csv'
+    full_path = os.path.join(file_directory, filename)
+    df = pd.read_csv(full_path, dtype={'timestamp': str}, low_memory=False)
+      
+    # Combine ICAO24 code and day to create a unique identifier for each flight
+    df['unique_flight'] = df['icao24'] + '_' + df['day'].astype(str)
+
+    # Add unique flights to the set
+    unique_flights.update(set(df['unique_flight']))
+
+print("Number of unique flights:", len(unique_flights))
+
