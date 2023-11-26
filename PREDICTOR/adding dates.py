@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # Specify the directory where your files are located
-directory_path = r'C:\Users\jayva\OneDrive\alles\Bureaublad\DATA\\'
+directory_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\\'
 
 # Iterate through files in the directory
 for i in range(1, 26):

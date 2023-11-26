@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 import os
 
 #to test use "file_10, and set your own directory"
-file_directory = r'C:\Users\jayva\OneDrive\alles\Bureaublad\DATA\\'
+file_directory = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\\'
 
 dataframe = {}
 
 unique_flights = []
 
-for i in range(21, 22):
+for i in range(1, 26):
     filename = f'File_{i}.csv'
     full_path = file_directory + filename  
     df = pd.read_csv(full_path, dtype={'timestamp': str}, low_memory=False)
