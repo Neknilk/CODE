@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 #to test use "file_10, and set your own directory"
-file_directory = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\\'
+file_directory = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\RAW\\'
 
 dataframe = {}
 

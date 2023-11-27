@@ -2,11 +2,11 @@ import pandas as pd
 import os
 
 # Specify the directory where your files are located
-directory_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\\'
+directory_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\\'
 
 # Iterate through files in the directory
-for i in range(1, 26):
-    file_name = f'File_{i}.csv'
+for i in range(1, 107):
+    file_name = f'flight{i}_smoothed_and_replaced.csv'
     file_path = os.path.join(directory_path, file_name)
 
     # Check if the file exists
@@ -19,7 +19,6 @@ for i in range(1, 26):
         df['timestamp'] = pd.to_datetime(df['timestamp'], format='%Y-%m-%d %H:%M:%S')
 
         # Extract date, year, month, and day into separate columns
-        df['day'] = df['timestamp'].dt.day
         df['hour'] = df['timestamp'].dt.hour
         df['minute'] = df['timestamp'].dt.minute
         df['second'] = df['timestamp'].dt.second
