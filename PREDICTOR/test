@@ -1,8 +1,65 @@
-import pandas as pf
-from sklearn.linear_model import
-MultiOutputRegressor
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.linear_model import LinearRegression
+from datetime import datetime, timedelta
 
-data = pd.read_csv(r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_file_with_flight_number\\')
+# Load the CSV file into a DataFrame with low_memory set to False
+data = pd.read_csv(r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\cleaned_combined_file.csv', low_memory=False)
 
-x = data[['altitude', 'latitude', 'longitude', 'numeric_timestamp']]
-y = data[['ground_speed', 'vertical_rate', 'track']]
+# Extracting features (X) and target variables (y)
+x = data[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']]
+y = data[['altitude', 'latitude', 'longitude']]
+
+# Split the data into training and testing sets
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+
+# Combine x_train and y_train before removing NaN values
+combined_data_train = pd.concat([x_train, y_train], axis=1)
+
+# Separate x_train and y_train after removing NaN values
+x_train = combined_data_train[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']]
+y_train = combined_data_train[['altitude', 'latitude', 'longitude']]
+
+# Create a multi-output linear regression model
+model = MultiOutputRegressor(LinearRegression())
+
+# Fit the model to the training data
+model.fit(x_train, y_train)
+
+# Assume the initial position, altitude, and time
+initial_position = {
+    'latitude': 50.3,
+    'longitude': 4.7,
+    'altitude': 15000,
+    'numeric_timestamp': 1665336712,
+    'ground_speed': 400,  # Default value
+    'vertical_rate': 1500,  # Default value
+    'track': 220  # Default value
+}
+
+# Create a DataFrame with the initial position
+initial_position_df = pd.DataFrame([initial_position])
+
+# Convert the timestamp to datetime format
+initial_position_df['numeric_timestamp'] = pd.to_datetime(initial_position_df['numeric_timestamp'], unit='s')
+
+# Convert the timestamp to float format
+initial_position_df['numeric_timestamp'] = initial_position_df['numeric_timestamp'].astype('int64')  # Assuming nanoseconds, adjust if necessary
+initial_position_df['numeric_timestamp'] = initial_position_df['numeric_timestamp'] / 10**9  # Convert nanoseconds to seconds
+
+# Add 10 minutes to the timestamp to predict 10 minutes ahead
+initial_position_df['numeric_timestamp'] += timedelta(minutes=10).total_seconds()
+
+# Use the trained model to make predictions
+predicted_values = model.predict(initial_position_df[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']])
+
+# Create a DataFrame for the predicted values with the desired columns
+predicted_df = pd.DataFrame(predicted_values, columns=['altitude', 'latitude', 'longitude'])
+
+# Add the initial position, altitude, and time, and the original input features to the predicted DataFrame
+predicted_df[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']] = initial_position_df[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']]
+predicted_df[['initial_latitude', 'initial_longitude', 'initial_altitude', 'initial_time']] = initial_position_df[['latitude', 'longitude', 'altitude', 'numeric_timestamp']]
+
+# 'predicted_df' now contains the predicted values along with the initial position, altitude, time, and timestamp
+print(predicted_df)
