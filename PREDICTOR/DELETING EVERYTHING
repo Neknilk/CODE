@@ -1,0 +1,26 @@
+import pandas as pd
+
+# File path
+file_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_file_with_flight_number.csv'
+
+# Load the CSV file into a DataFrame
+df = pd.read_csv(file_path, low_memory=False)
+
+# Columns to process
+columns_to_process = ['altitude', 'latitude', 'longitude', 'ground_speed', 'vertical_rate', 'track',]
+
+# Count and print the number of NaN entries before removal
+nan_count_before = df[columns_to_process].isna().sum().sum()
+print(f'Number of NaN entries before removal: {nan_count_before}')
+
+# Remove rows with NaN values in specified columns
+df.dropna(subset=columns_to_process, inplace=True)
+
+# Count and print the number of NaN entries after removal
+nan_count_after = df[columns_to_process].isna().sum().sum()
+print(f'Number of NaN entries after removal: {nan_count_after}')
+
+# Save the modified DataFrame back to the same CSV file
+df.to_csv(file_path, index=False)
+
+print('NaN values removed and file saved successfully.')

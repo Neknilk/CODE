@@ -2,13 +2,19 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+import matplotlib as mpl
+
+
+mpl.rcParams['agg.path.chunksize'] = 10000
 
 # Load the CSV file into a DataFrame with low_memory set to False
-data = pd.read_csv(r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\cleaned_combined_file.csv', low_memory=False)
+data = pd.read_csv(r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_data.csv', low_memory=False)
 
 # Extracting features (X) and target variables (y)
-x = data[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']]
+x = data[['ground_speed', 'vertical_rate', 'track', 'epoch_time']]
 y = data[['altitude', 'latitude', 'longitude']]
 
 # Split the data into training and testing sets
@@ -18,7 +24,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_
 combined_data_train = pd.concat([x_train, y_train], axis=1)
 
 # Separate x_train and y_train after removing NaN values
-x_train = combined_data_train[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']]
+x_train = combined_data_train[['ground_speed', 'vertical_rate', 'track', 'epoch_time']]
 y_train = combined_data_train[['altitude', 'latitude', 'longitude']]
 
 # Create a multi-output linear regression model
@@ -31,20 +37,37 @@ model.fit(x_train, y_train)
 combined_data_test = pd.concat([x_test, y_test], axis=1)
 
 # Separate x_test and y_test after removing NaN values
-x_test = combined_data_test[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']]
+x_test = combined_data_test[['ground_speed', 'vertical_rate', 'track', 'epoch_time']]
 y_test = combined_data_test[['altitude', 'latitude', 'longitude']]
 
 # Evaluate the model on the test data and calculate the R-squared value
-r2_score = model.score(x_test, y_test)
+y_pred = model.predict(x_test)
+r2 = r2_score(y_test, y_pred)
+print("R-squared value:", r2)
 
-print("R-squared value:", r2_score)
+# Print coefficients and mean squared error
+print("Coefficients: \n", model.estimators_[0].coef_)  # Assuming that all estimators have the same coefficients
+
+# Calculate mean squared error
+mse = mean_squared_error(y_test, y_pred)
+print("Mean squared error: %.2f" % mse)
+
+# Plot outputs (Note: You may need to adapt this part based on your specific use case)
+fig, ax = plt.subplots()
+
+# For example, if you want to visualize predictions for the 'altitude' variable:
+ax.scatter(x_test['epoch_time'], y_test['altitude'], color="black", label="Actual")
+ax.plot(x_test['epoch_time'], y_pred[:, 0], color="blue", linewidth=3, label="Predicted")
+
+ax.set_xlabel('Timestamp')
+ax.set_ylabel('Altitude')
 
 # Assume the initial position, altitude, and time
 initial_position = {
     'latitude': 50.3,
     'longitude': 4.7,
     'altitude': 15000,
-    'numeric_timestamp': 1665336712,
+    'epoch_time': 1665336712,
     'ground_speed': 400,  # Default value
     'vertical_rate': 1500,  # Default value
     'track': 180  # Default value
@@ -53,23 +76,25 @@ initial_position = {
 initial_position_df = pd.DataFrame([initial_position])
 
 # Convert the timestamp to datetime format
-initial_position_df['numeric_timestamp'] = pd.to_datetime(initial_position_df['numeric_timestamp'], unit='s')
+initial_position_df['epoch_time'] = pd.to_datetime(initial_position_df['epoch_time'], unit='s')
 
 # Convert the timestamp to float format
-initial_position_df['numeric_timestamp'] = initial_position_df['numeric_timestamp'].astype('int64')  # Assuming nanoseconds, adjust if necessary
-initial_position_df['numeric_timestamp'] = initial_position_df['numeric_timestamp'] / 10**9  # Convert nanoseconds to seconds
+initial_position_df['epoch_time'] = initial_position_df['epoch_time'].astype('int64')  # Assuming nanoseconds, adjust if necessary
+initial_position_df['epoch_time'] = initial_position_df['epoch_time'] / 10**9  # Convert nanoseconds to seconds
 
 # Add 10 minutes to the timestamp to predict 10 minutes ahead
-initial_position_df['numeric_timestamp'] += timedelta(minutes=10).total_seconds()
+initial_position_df['epoch_time'] += timedelta(minutes=10).total_seconds()
 
 # Use the trained model to make predictions
-predicted_values = model.predict(initial_position_df[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']])
+predicted_values = model.predict(initial_position_df[['ground_speed', 'vertical_rate', 'track', 'epoch_time']])
 
 # Create a DataFrame for the predicted values with the desired columns
 predicted_df = pd.DataFrame(predicted_values, columns=['altitude', 'latitude', 'longitude'])
 
 # Add the initial position, altitude, and time, and the original input features to the predicted DataFrame
-predicted_df[['initial_latitude', 'initial_longitude', 'initial_altitude', 'initial_time']] = initial_position_df[['latitude', 'longitude', 'altitude', 'numeric_timestamp']]
+predicted_df[['initial_latitude', 'initial_longitude', 'initial_altitude', 'initial_time']] = initial_position_df[['latitude', 'longitude', 'altitude', 'epoch_time']]
 
 # 'predicted_df' now contains the predicted values along with the initial position, altitude, time, and timestamp
 print(predicted_df)
+plt.legend()
+plt.show()
