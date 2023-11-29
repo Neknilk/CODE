@@ -27,6 +27,18 @@ model = MultiOutputRegressor(LinearRegression())
 # Fit the model to the training data
 model.fit(x_train, y_train)
 
+# Combine x_test and y_test before removing NaN values
+combined_data_test = pd.concat([x_test, y_test], axis=1)
+
+# Separate x_test and y_test after removing NaN values
+x_test = combined_data_test[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']]
+y_test = combined_data_test[['altitude', 'latitude', 'longitude']]
+
+# Evaluate the model on the test data and calculate the R-squared value
+r2_score = model.score(x_test, y_test)
+
+print("R-squared value:", r2_score)
+
 # Assume the initial position, altitude, and time
 initial_position = {
     'latitude': 50.3,
@@ -35,9 +47,8 @@ initial_position = {
     'numeric_timestamp': 1665336712,
     'ground_speed': 400,  # Default value
     'vertical_rate': 1500,  # Default value
-    'track': 220  # Default value
+    'track': 180  # Default value
 }
-
 # Create a DataFrame with the initial position
 initial_position_df = pd.DataFrame([initial_position])
 
@@ -58,7 +69,6 @@ predicted_values = model.predict(initial_position_df[['ground_speed', 'vertical_
 predicted_df = pd.DataFrame(predicted_values, columns=['altitude', 'latitude', 'longitude'])
 
 # Add the initial position, altitude, and time, and the original input features to the predicted DataFrame
-predicted_df[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']] = initial_position_df[['ground_speed', 'vertical_rate', 'track', 'numeric_timestamp']]
 predicted_df[['initial_latitude', 'initial_longitude', 'initial_altitude', 'initial_time']] = initial_position_df[['latitude', 'longitude', 'altitude', 'numeric_timestamp']]
 
 # 'predicted_df' now contains the predicted values along with the initial position, altitude, time, and timestamp
