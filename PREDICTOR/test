@@ -1,100 +1,16 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-import matplotlib as mpl
 
+# Replace 'your_file.csv' with the actual path to your CSV file
+file_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_data_filled.csv'
 
-mpl.rcParams['agg.path.chunksize'] = 10000
+# Read the CSV file into a Pandas DataFrame
+df = pd.read_csv(file_path)
 
-# Load the CSV file into a DataFrame with low_memory set to False
-data = pd.read_csv(r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_data.csv', low_memory=False)
+# Replace 'your_column_name' with the actual name of the column you're interested in
+column_name = 'epoch_time'
 
-# Extracting features (X) and target variables (y)
-x = data[['ground_speed', 'vertical_rate', 'track', 'epoch_time']]
-y = data[['altitude', 'latitude', 'longitude']]
+# Filter and print rows where the values are not integers in the specified column
+non_integer_rows = df[~df[column_name].astype(str).str.isdigit()]
 
-# Split the data into training and testing sets
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
-
-# Combine x_train and y_train before removing NaN values
-combined_data_train = pd.concat([x_train, y_train], axis=1)
-
-# Separate x_train and y_train after removing NaN values
-x_train = combined_data_train[['ground_speed', 'vertical_rate', 'track', 'epoch_time']]
-y_train = combined_data_train[['altitude', 'latitude', 'longitude']]
-
-# Create a multi-output linear regression model
-model = MultiOutputRegressor(LinearRegression())
-
-# Fit the model to the training data
-model.fit(x_train, y_train)
-
-# Combine x_test and y_test before removing NaN values
-combined_data_test = pd.concat([x_test, y_test], axis=1)
-
-# Separate x_test and y_test after removing NaN values
-x_test = combined_data_test[['ground_speed', 'vertical_rate', 'track', 'epoch_time']]
-y_test = combined_data_test[['altitude', 'latitude', 'longitude']]
-
-# Evaluate the model on the test data and calculate the R-squared value
-y_pred = model.predict(x_test)
-r2 = r2_score(y_test, y_pred)
-print("R-squared value:", r2)
-
-# Print coefficients and mean squared error
-print("Coefficients: \n", model.estimators_[0].coef_)  # Assuming that all estimators have the same coefficients
-
-# Calculate mean squared error
-mse = mean_squared_error(y_test, y_pred)
-print("Mean squared error: %.2f" % mse)
-
-# Plot outputs (Note: You may need to adapt this part based on your specific use case)
-fig, ax = plt.subplots()
-
-# For example, if you want to visualize predictions for the 'altitude' variable:
-ax.scatter(x_test['epoch_time'], y_test['altitude'], color="black", label="Actual")
-ax.plot(x_test['epoch_time'], y_pred[:, 0], color="blue", linewidth=3, label="Predicted")
-
-ax.set_xlabel('Timestamp')
-ax.set_ylabel('Altitude')
-
-# Assume the initial position, altitude, and time
-initial_position = {
-    'latitude': 50.3,
-    'longitude': 4.7,
-    'altitude': 15000,
-    'epoch_time': 1665336712,
-    'ground_speed': 400,  # Default value
-    'vertical_rate': 1500,  # Default value
-    'track': 180  # Default value
-}
-# Create a DataFrame with the initial position
-initial_position_df = pd.DataFrame([initial_position])
-
-# Convert the timestamp to datetime format
-initial_position_df['epoch_time'] = pd.to_datetime(initial_position_df['epoch_time'], unit='s')
-
-# Convert the timestamp to float format
-initial_position_df['epoch_time'] = initial_position_df['epoch_time'].astype('int64')  # Assuming nanoseconds, adjust if necessary
-initial_position_df['epoch_time'] = initial_position_df['epoch_time'] / 10**9  # Convert nanoseconds to seconds
-
-# Add 10 minutes to the timestamp to predict 10 minutes ahead
-initial_position_df['epoch_time'] += timedelta(minutes=10).total_seconds()
-
-# Use the trained model to make predictions
-predicted_values = model.predict(initial_position_df[['ground_speed', 'vertical_rate', 'track', 'epoch_time']])
-
-# Create a DataFrame for the predicted values with the desired columns
-predicted_df = pd.DataFrame(predicted_values, columns=['altitude', 'latitude', 'longitude'])
-
-# Add the initial position, altitude, and time, and the original input features to the predicted DataFrame
-predicted_df[['initial_latitude', 'initial_longitude', 'initial_altitude', 'initial_time']] = initial_position_df[['latitude', 'longitude', 'altitude', 'epoch_time']]
-
-# 'predicted_df' now contains the predicted values along with the initial position, altitude, time, and timestamp
-print(predicted_df)
-plt.legend()
-plt.show()
+print(f"Rows with non-integer values in the column '{column_name}':")
+print(non_integer_rows)
