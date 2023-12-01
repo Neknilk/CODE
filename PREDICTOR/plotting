@@ -1,0 +1,19 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+file_path = 'C:/Users/jayva/Documents/GitHub/FOE/DATA/FILTERED/combined_data_filled.csv'
+df = pd.read_csv(file_path, low_memory=False)
+
+# Assuming your DataFrame has columns 'flight_duration_seconds' and 'altitude'
+# Adjust the column names accordingly if they are different in your CSV file.
+x_column = 'flight_duration_seconds'
+y_column = 'altitude'
+
+# Plotting
+plt.figure(figsize=(10, 6))
+plt.scatter(df[x_column], df[y_column], alpha=0.5)
+plt.title('Flight Duration vs Altitude')
+plt.xlabel('Flight Duration (seconds)')
+plt.ylabel('Altitude')
+plt.grid(True)
+plt.show()

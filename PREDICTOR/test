@@ -1,16 +1,20 @@
 import pandas as pd
 
-# Replace 'your_file.csv' with the actual path to your CSV file
-file_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_data_filled.csv'
+file_path = 'C:/Users/jayva/Documents/GitHub/FOE/DATA/FILTERED/combined_data_filled.csv'
+df = pd.read_csv(file_path, low_memory=False)
 
-# Read the CSV file into a Pandas DataFrame
-df = pd.read_csv(file_path)
+# Count the number of rows in the original DataFrame
+original_rows = len(df)
 
-# Replace 'your_column_name' with the actual name of the column you're interested in
-column_name = 'epoch_time'
+# Assuming 'flight_duration_seconds' is the column you want to filter
+df = df[df['flight_duration_seconds'] <= 10000]
 
-# Filter and print rows where the values are not integers in the specified column
-non_integer_rows = df[~df[column_name].astype(str).str.isdigit()]
+# Count the number of rows in the modified DataFrame
+modified_rows = len(df)
 
-print(f"Rows with non-integer values in the column '{column_name}':")
-print(non_integer_rows)
+# Print the amount of deleted data
+deleted_rows = original_rows - modified_rows
+print(f"Number of rows deleted: {deleted_rows}")
+
+# Save the modified DataFrame back to the original file
+df.to_csv(file_path, index=False)

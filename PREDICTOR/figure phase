@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 df = pd.read_csv('C:\\Users\\jayva\\Documents\\GitHub\\FOE\\DATA\\FILTERED\\combined_data_filled.csv', low_memory=False)
 
 # Filter data for a specific flight (e.g., flight 1)
-flight_data = df[df['flight'] == 1]
+flight_data = df[df['flight'] == 69]
 
 # Convert the 'timestamp' column to datetime
 flight_data['timestamp'] = pd.to_datetime(flight_data['timestamp'])
