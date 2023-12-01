@@ -1,0 +1,30 @@
+import pandas as pd
+
+# Read the CSV file into a DataFrame
+df = pd.read_csv('C:\\Users\\jayva\\Documents\\GitHub\\FOE\\DATA\\FILTERED\\combined_phases.csv', low_memory=False)
+
+# Set the timestamp column as the DataFrame index
+df['timestamp'] = pd.to_datetime(df['timestamp'])
+df.set_index('timestamp', inplace=True)
+
+# Create a DataFrame with a complete timestamp range
+complete_timestamp_range = pd.date_range(start=df.index.min(), end=df.index.max(), freq='S')
+complete_df = pd.DataFrame(index=complete_timestamp_range)
+
+# Merge the original DataFrame with the complete DataFrame using an inner join
+merged_df = complete_df.merge(df, left_index=True, right_index=True, how='inner')
+
+# Fill missing flight phase entries with the specified value using backward fill
+merged_df['flight_phase'].fillna(method='bfill', inplace=True)
+
+# Filter out rows where flight_duration_seconds is higher than 11000
+merged_df = merged_df[merged_df['flight_duration_seconds'] <= 11000]
+
+# Reset the index to make 'timestamp' a regular column again
+merged_df.reset_index(inplace=True)
+
+# Save the modified DataFrame back to a CSV file
+merged_df.to_csv('C:\\Users\\jayva\\Documents\\GitHub\\FOE\\DATA\\FILTERED\\combined_filled.csv', index=False)
+
+# Print a message indicating that the process is finished
+print("Processing finished. Modified file saved as 'modified_combined_phases.csv'.")

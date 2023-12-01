@@ -1,0 +1,48 @@
+import pandas as pd
+import statsmodels.api as sm
+from scipy.stats import f_oneway
+import joblib
+
+# Load data
+filtered_data = pd.read_csv(r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_data_filled.csv', low_memory=False)
+
+# Specify variables
+independent_variables = ['ground_speed', 'vertical_rate', 'track', 'flight_duration_seconds']
+dependent_variable = 'latitude'
+
+# Fit linear regression models
+models = []
+model_paths = [
+    r'C:\Users\jayva\Documents\GitHub\FOE\climb_linear_regression_model_altitude.joblib',
+    r'C:\Users\jayva\Documents\GitHub\FOE\climb_linear_regression_model_latitude.joblib',
+    r'C:\Users\jayva\Documents\GitHub\FOE\climb_linear_regression_model_longitude.joblib',
+    r'C:\Users\jayva\Documents\GitHub\FOE\cruise_linear_regression_model_altitude.joblib',
+    r'C:\Users\jayva\Documents\GitHub\FOE\cruise_linear_regression_model_latitude.joblib',
+    r'C:\Users\jayva\Documents\GitHub\FOE\cruise_linear_regression_model_longitude.joblib',
+    r'C:\Users\jayva\Documents\GitHub\FOE\descent_linear_regression_model_altitude.joblib',
+    r'C:\Users\jayva\Documents\GitHub\FOE\descent_linear_regression_model_latitude.joblib',
+    r'C:\Users\jayva\Documents\GitHub\FOE\descent_linear_regression_model_longitude.joblib',
+]
+
+for i, model_path in enumerate(model_paths, start=1):
+    model = joblib.load(model_path)
+    models.append(model)
+
+    # Create a design matrix without adding a constant for scikit-learn models
+    X_no_const = filtered_data[independent_variables]
+
+    # Fit the model
+    y_pred = model.predict(X_no_const) if hasattr(model, 'predict') else model.predict(sm.add_constant(X_no_const))
+
+    # Perform F-test
+    f_stat, p_value = f_oneway(y_pred, filtered_data[dependent_variable])
+
+    # Print results for each model
+    print(f'\nModel_{i} - F-statistic: {f_stat}')
+    print(f'Model_{i} - P-value: {p_value}')
+
+    # Compare p-value to a significance level (e.g., 0.05) to make a decision about the null hypothesis
+    if p_value < 0.05:
+        print(f'Model_{i} - Reject the null hypothesis')
+    else:
+        print(f'Model_{i} - Fail to reject the null hypothesis')
