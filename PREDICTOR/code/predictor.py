@@ -21,13 +21,19 @@ model_paths = {
 # Load the models
 models = {key: load(path) for key, path in model_paths.items()}
 
-# Example input values (replace with actual user input)
+# Get user input for the example_user_inputs dictionary
 example_user_inputs = {
-    'ground_speed': 500,
-    'vertical_rate': 1000,
-    'flight_duration_seconds': 2000,
-    'track': 45,
+    'ground_speed': float(input("Enter ground speed: ")),
+    'vertical_rate': float(input("Enter vertical rate: ")),
+    'flight_duration_minutes': float(input("Enter flight duration in minutes: ")),
+    'track': float(input("Enter track: ")),
 }
+
+# Add 10 minutes to the flight duration
+example_user_inputs['flight_duration_minutes'] += 10
+
+# Convert updated flight duration from minutes to seconds
+example_user_inputs['flight_duration_seconds'] = example_user_inputs['flight_duration_minutes'] * 60
 
 # Determine the phase based on user input time
 if example_user_inputs['flight_duration_seconds'] < 1600:
