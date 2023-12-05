@@ -1,4 +1,6 @@
 import pandas as pd
+# deleted these colomns in order to make the the data file small enough to upload to brightspace so that you can use the PREDICTOR.py to get the 4D output
+
 
 # Replace the file path with the actual file path of your CSV
 file_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_filled.csv'

@@ -5,7 +5,7 @@ import numpy as np
 # Load the model for altitude
 model_altitude = joblib.load('C:\\Users\\jayva\\Documents\\GitHub\\FOE\\climb_linear_regression_model_altitude.joblib')
 
-# Set specific values for the other independent variables
+# Set specific values for the other independent variables (random)
 ground_speed = 438
 vertical_rate = 558
 flight_duration_seconds = 1200

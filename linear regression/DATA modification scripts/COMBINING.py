@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+# data was seperated per flight in a csv for data cleaning. this script combined all cleaned data in one csv and added a column with the number from 1 to 2633 
+
 
 # Set the directory where your CSV files are located
 directory_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\\'

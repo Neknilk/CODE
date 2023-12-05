@@ -1,4 +1,8 @@
 import pandas as pd
+# because of linear regression the flight needs to be seperated into 3 phases climb descent and cruise. this is the code that assigns the phases. 
+# it will look at the altitude change over a period of 5 minutes. it will assign climb of that difference is > 500, descent when it is smaller then -1000. and inbetween will be cruise.
+# this will analyse the change for every 300 seconds so there will be an entrie by 300 seconds after takeoff 600, 900, 1200, etc. another script will fille in the phases inbetween
+
 
 # Replace 'your_existing_data.csv' with the path to your CSV file
 file_path = r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_data.csv'

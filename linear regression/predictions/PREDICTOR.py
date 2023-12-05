@@ -2,6 +2,11 @@ from joblib import load
 import numpy as np
 import pandas as pd
 
+#this script uses the made models in 'linear regression' in order to predict the lat long and altitude. to get the input for the models the user inputs a time after takeoff in minutes
+# this number will collect all the input data of the independend variables and calculate the average of all those inputs.
+# to determine the model the script will use the the flight phase that is most common during the given time. the average inputs are calculated and put in the models to calculate
+#the predicted location and time. 
+
 # Define independent and dependent variables
 independent_variables = ['ground_speed', 'vertical_rate', 'flight_duration_seconds', 'track']
 dependent_variables = ['altitude', 'latitude', 'longitude']
@@ -33,15 +38,15 @@ user_input_time_minutes = float(input("Enter the current time in minutes after t
 user_input_time_seconds = user_input_time_minutes * 60  # Convert minutes to seconds
 print('loading this may take some time.....')
 
-# Read data from the CSV file
+# use the combined_reduced csv 
 data = pd.read_csv(r'C:\Users\jayva\Documents\GitHub\FOE\DATA\FILTERED\combined_reduced.csv', low_memory=False)
 
-# Calculate the average values at the specified time
+# Calculate the average values at the specified time for the input of the model
 filtered_data = data[data['flight_duration_seconds'] == user_input_time_seconds]
 average_inputs = {var: filtered_data[var].mean() for var in independent_variables}
 average_inputs['flight_duration_seconds'] = user_input_time_seconds
 
-# Determine the most common flight phase based on the data
+# Determine the most common flight phase based on the data. with this it will use the climb cruise or descent models
 most_common_flight_phase = data['flight_phase'].mode()[0]
 
 # Use the models corresponding to the most common phase for predictions
@@ -50,7 +55,7 @@ predictions = {
     for var in dependent_variables
 }
 
-# Print the average values and predictions
+# the results of the average inputs during the input time
 print(f"Most Common Phase: {most_common_flight_phase.capitalize()}")
 print("Average Values:")
 for var, value in average_inputs.items():

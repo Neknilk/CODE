@@ -20,7 +20,7 @@ cruise_data = df[df['flight_phase'] == 'cruise']
 # Encode the flight_phase column to numerical values
 df['flight_phase_encoded'] = df['flight_phase'].astype('category').cat.codes
 
-# Iterate over unique flight phases
+# this makes climb cruise and descent models where each output lat long and altitude will also be a seperate model
 for phase, phase_data in zip(['climb', 'cruise', 'descent'], [climb_data, cruise_data, descent_data]):
     # Extract features and target variables
     X = phase_data[independent_variables]
