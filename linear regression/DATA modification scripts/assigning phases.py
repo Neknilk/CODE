@@ -20,7 +20,7 @@ df.set_index('timestamp', inplace=True)
 def get_flight_phase(altitude_change):
     if altitude_change > 500:
         return 'climb'
-    elif altitude_change < -1000:
+    elif altitude_change < -700:
         return 'descent'
     else:
         return 'cruise'

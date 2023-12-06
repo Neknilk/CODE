@@ -20,7 +20,7 @@ merged_df = complete_df.merge(df, left_index=True, right_index=True, how='inner'
 merged_df['flight_phase'].fillna(method='bfill', inplace=True)
 
 # Filter out rows where flight_duration_seconds is higher than 11000
-merged_df = merged_df[merged_df['flight_duration_seconds'] <= 11000]
+merged_df = merged_df[merged_df['flight_duration_seconds'] <= 9000]
 
 # Reset the index to make 'timestamp' a regular column again
 merged_df.reset_index(inplace=True)
